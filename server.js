@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var url = "mongodb://localhost:27017/local";
+var url = process.env.MONGOLAB_URI //"mongodb://localhost:27017/local";
 var mongo = require('mongodb').MongoClient;
 var lastEntryNr;
 
@@ -26,7 +26,7 @@ mongo.connect(url, function(err, db) {
 });
 
 app.use('/new', function(req, res, next){
-    
+
     //console.log("NEW!" + JSON.stringify(req.url));
     var entry = {
         entry_nr: ++lastEntryNr,
@@ -44,7 +44,7 @@ app.use('/new', function(req, res, next){
             if (err) throw err;
             
             res.writeHead(200, { 'Content-Type': 'application/json' }); 
-            console.log("REDIRECTED - "+ JSON.stringify({
+            console.log("NEW ENTRY  - "+ JSON.stringify({
                     entry_nr: entry.entry_nr,
                     original_url: entry.original_url, 
                     client_ip: req.headers['x-forwarded-for']}));
@@ -61,7 +61,7 @@ app.use('/new', function(req, res, next){
 
 app.use('/', function(req, res, next){
     //console.log("REDIRECT REQUEST" + JSON.stringify(req.url));
-    
+
     if (req.url == "/favicon.ico"){
         res.end();
         //console.log("FAVICON REQUEST DROPPED");
