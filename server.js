@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var url = process.env.MONGOLAB_URI //"mongodb://localhost:27017/local";
+var url = process.env.MONGOLAB_URI; //on Heroku, "mongodb://localhost:27017/local" on C9;
 var mongo = require('mongodb').MongoClient;
 var lastEntryNr;
 
@@ -27,7 +27,7 @@ mongo.connect(url, function(err, db) {
 
 app.use('/new', function(req, res, next){
 
-    //console.log("NEW!" + JSON.stringify(req.url));
+    //console.log("ENTRY REQUEST on " + JSON.stringify(req.url));
     var entry = {
         entry_nr: ++lastEntryNr,
         original_url: req.url.substring(1),
@@ -50,18 +50,15 @@ app.use('/new', function(req, res, next){
                     client_ip: req.headers['x-forwarded-for']}));
             delete entry._id;
             delete entry.entry_nr;
-            db.close();
             res.end(JSON.stringify(entry));
-            
+            db.close();
         });
-        
     });
-    
 });
 
 app.use('/', function(req, res, next){
-    //console.log("REDIRECT REQUEST" + JSON.stringify(req.url));
-
+    
+    //console.log("REDIRECT REQUEST on " + JSON.stringify(req.url));
     if (req.url == "/favicon.ico"){
         res.end();
         //console.log("FAVICON REQUEST DROPPED");
@@ -72,7 +69,7 @@ app.use('/', function(req, res, next){
           if (err) throw err;
           var shorturls = db.collection('shorturls');
           
-          shorturls.find({                              //didnt use findOne() for debugging purposes
+          shorturls.find({ //didnt use findOne() for debugging purposes
             entry_nr: parseInt(req.url.substring(1), 10)
           }).toArray(function(err, documents) {
               
@@ -103,7 +100,6 @@ app.use('/', function(req, res, next){
                 res.end();
             }
           });
-          
         });
     }
 });
