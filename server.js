@@ -84,7 +84,7 @@ app.use('/', function(req, res, next){
             
             if (documents.length == 0){
                 res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end("Entry Nr \"" + req.url.substring(1) + "\" not found!");
+                res.end("Entry Nr \"" + req.url.substring(1) + "\" not found!\n\nshorturl usage: https://" + req.hostname + "/new/<url you want shortened>");
                 db.close();
                 console.log("USER ERROR - Entry Nr \"" + req.url.substring(1) + "\" not found!");
             }else{
