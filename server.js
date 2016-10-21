@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var url = process.env.MONGOLAB_URI; //on Heroku, "mongodb://localhost:27017/local" on C9;
+var url = process.env.MONGOLAB_URI; // old "mongodb://localhost:27017/local" ;
 var mongo = require('mongodb').MongoClient;
 var lastEntryNr;
 
@@ -26,11 +26,11 @@ mongo.connect(url, function(err, db) {
 });
 
 app.use('/new', function(req, res, next){
-
+    
     //console.log("ENTRY REQUEST on " + JSON.stringify(req.url));
     var entry = {
         entry_nr: ++lastEntryNr,
-        original_url: req.url.substring(1),
+        original_url: decodeURI(req.url).substring(1),
         short_url: "https://" + req.hostname + "/" + lastEntryNr
     };
     
