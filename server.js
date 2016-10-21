@@ -6,7 +6,6 @@ var lastEntryNr;
 var regex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/);
 
 
-
 mongo.connect(url, function(err, db) {
     
     if (err) throw err;
@@ -31,7 +30,7 @@ app.use('/new', function(req, res, next){
     
     //console.log("ENTRY REQUEST on " + JSON.stringify(req.url));
     if (!decodeURI(req.url).match(regex))
-        res.end(JSON.stringify({"Error": req.url.substring(1) + " is not a valid URL."}));
+        res.end(JSON.stringify({"Error": "Invalid URL"})); // not specifying protocol is fine though!
     else{
         
         var entry = {
