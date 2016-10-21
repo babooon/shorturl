@@ -31,7 +31,7 @@ app.use('/new', function(req, res, next){
     
     //console.log("ENTRY REQUEST on " + JSON.stringify(req.url));
     if (!decodeURI(req.url).match(regex))
-        res.end(JSON.stringify({"Error ": decodeURI(req.url) + " is not a valid URL."}));
+        res.end(JSON.stringify({"Error": req.url + " is not a valid URL."}));
     else{
         
         var entry = {
