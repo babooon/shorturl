@@ -3,6 +3,8 @@ var app = express();
 var url = process.env.MONGOLAB_URI; // old "mongodb://localhost:27017/local" ;
 var mongo = require('mongodb').MongoClient;
 var lastEntryNr;
+var regex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/);
+
 
 
 mongo.connect(url, function(err, db) {
@@ -28,32 +30,37 @@ mongo.connect(url, function(err, db) {
 app.use('/new', function(req, res, next){
     
     //console.log("ENTRY REQUEST on " + JSON.stringify(req.url));
-    var entry = {
-        entry_nr: ++lastEntryNr,
-        original_url: decodeURI(req.url).substring(1),
-        short_url: "https://" + req.hostname + "/" + lastEntryNr
-    };
+    if (!decodeURI(req.url).match(regex))
+        res.end(JSON.stringify({"Error ": decodeURI(req.url) + " is not a valid URL."}));
+    else{
+        
+        var entry = {
+            entry_nr: ++lastEntryNr,
+            original_url: decodeURI(req.url).substring(1),
+            short_url: "https://" + req.hostname + "/" + lastEntryNr
+        };
+         
+        mongo.connect(url, function(err, db) {
     
-    mongo.connect(url, function(err, db) {
-
-        if (err) throw err;
-        var shorturls = db.collection('shorturls');
-    
-        shorturls.insertOne(entry, function(err, data) {
-            
             if (err) throw err;
-            
-            res.writeHead(200, { 'Content-Type': 'application/json' }); 
-            console.log("NEW ENTRY  - "+ JSON.stringify({
-                    entry_nr: entry.entry_nr,
-                    original_url: entry.original_url, 
-                    client_ip: req.headers['x-forwarded-for']}));
-            delete entry._id;
-            delete entry.entry_nr;
-            res.end(JSON.stringify(entry));
-            db.close();
+            var shorturls = db.collection('shorturls');
+        
+            shorturls.insertOne(entry, function(err, data) {
+                
+                if (err) throw err;
+                
+                res.writeHead(200, { 'Content-Type': 'application/json' }); 
+                console.log("NEW ENTRY  - "+ JSON.stringify({
+                        entry_nr: entry.entry_nr,
+                        original_url: entry.original_url, 
+                        client_ip: req.headers['x-forwarded-for']}));
+                delete entry._id;
+                delete entry.entry_nr;
+                res.end(JSON.stringify(entry));
+                db.close();
+            });
         });
-    });
+    }
 });
 
 app.use('/', function(req, res, next){
@@ -69,7 +76,7 @@ app.use('/', function(req, res, next){
           if (err) throw err;
           var shorturls = db.collection('shorturls');
           
-          shorturls.find({ //didnt use findOne() for debugging purposes
+          shorturls.find({ //its not findOne() for debugging purposes
             entry_nr: parseInt(req.url.substring(1), 10)
           }).toArray(function(err, documents) {
               
