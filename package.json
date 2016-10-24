@@ -1,14 +1,24 @@
 {
   "name": "shorturl",
   "version": "1.0.2",
-  "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "true"
+    "start": "node server.js"
   },
   "author": "babooon",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.14.0"
-  }
+    "express": "^4.14.0",
+    "mongodb": "^2.2.11"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/babooon/shorturl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/babooon/shorturl/issues"
+  },
+  "homepage": "https://github.com/babooon/shorturl#readme",
+  "description": ""
 }
